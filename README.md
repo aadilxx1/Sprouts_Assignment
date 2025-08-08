@@ -47,8 +47,7 @@ making the ranking of candidates more accurate and relevant.
   - TXT resumes → directly read as text  
   - Minimal cleaning (remove extra spaces, special characters where needed)
 
-- **Embedding Generation**  
-  - Used **all-MiniLM-L6-v2** from sentence-transformers for generating 384-dimensional embeddings.  
+- **Embedding Generation**    
   - Generated embeddings for:  
     - Job description (once)  
     - Each resume (individually)
