@@ -1,88 +1,114 @@
-# Sprouts_Assignment
-Candidate Recommendation Engine powered by LLM
-Candidate Recommendation Engine
-📌 Overview
-This Candidate Recommendation Engine ranks and summarizes resumes against a given job description using Natural Language Processing (NLP) and semantic similarity techniques.
-It is designed to assist recruiters and hiring managers in quickly identifying top candidates from a pool of resumes.
+
+# Candidate Recommendation Engine powered by LLM
+
+## 📌 Overview
+
+This Candidate Recommendation Engine ranks and summarizes resumes against a given job description using Natural Language Processing (NLP) and semantic similarity techniques. It is designed to assist recruiters and hiring managers in quickly identifying top candidates from a pool of resumes.
 
 The application:
 
-Accepts a job description (text input).
+- Accepts a **job description** (text input).
+- Accepts **multiple resumes** (PDF or TXT files).
+- Extracts and cleans resume text.
+- Generates semantic embeddings using **sentence-transformers**.
+- Calculates **cosine similarity** between each resume and the job description.
+- Uses a lightweight LLM (**MBZUAI/LaMini-Flan-T5-248M**) for a short, human-readable explanation of why the candidate is a good fit.
+- Displays ranked results with:
+  - **Candidate Name** (from resume or filename)
+  - **File Name**
+  - **Similarity Score**
+  - **Summary**
 
-Accepts multiple resumes (PDF, DOCX, or TXT files).
+---
 
-Extracts and cleans resume text.
+## 🛠 Approach
 
-Generates semantic embeddings using sentence-transformers.
+##  AI Summarization
 
-Calculates cosine similarity between each resume and the job description.
+I chose **not to use GPT API or Gemini API** for the AI-powered candidate summary because 
+I wanted to explore alternative options and deepen my understanding of
+open-source large language models (LLMs).
 
-Uses a lightweight LLM (MBZUAI/LaMini-Flan-T5-248M) for a short, human-readable explanation of why the candidate is a good fit.
+After experimenting with several LLM models, I finalized on using the **MBZUAI/LaMini-Flan-T5-248M** 
+model for generating candidate summaries. This model provides a good balance of performance 
+and efficiency for summarization tasks, and working with it has helped me learn more about 
+LLMs outside of the popular API-based services.
 
-Displays ranked results with:
+##  Embeddings
+- For generating semantic embeddings to measure resume-job description similarity, 
+I used **all-mpnet-base-v2** from the sentence-transformers library. This model 
+provided better cosine similarity results compared to other embedding models I tested,
+making the ranking of candidates more accurate and relevant.
 
-Candidate Name (from resume or filename)
 
-File Name
+- **Text Extraction**  
+  - PDF resumes → parsed using PyPDF2  
+  - DOCX resumes → parsed using python-docx  
+  - TXT resumes → directly read as text  
+  - Minimal cleaning (remove extra spaces, special characters where needed)
 
-Similarity Score
+- **Embedding Generation**  
+  - Used **all-MiniLM-L6-v2** from sentence-transformers for generating 384-dimensional embeddings.  
+  - Generated embeddings for:  
+    - Job description (once)  
+    - Each resume (individually)
 
-Summary
+- **Similarity Calculation**  
+  - Computed cosine similarity between the job description embedding and each resume embedding.  
+  - Higher score = higher semantic similarity to the job description.
 
-🛠 Approach
-1. Text Extraction
-PDF resumes → parsed using PyPDF2
+- **Candidate Name Extraction**  
+  - Tried extracting candidate’s name from the first 3 lines of the resume (common format for names at the top).  
+  - If not found, fell back to filename without extension.
 
-DOCX resumes → parsed using python-docx
+- **Summary Generation**  
+  - Used **MBZUAI/LaMini-Flan-T5-248M** LLM for generating short summaries.  
+  - Prompt: *"Why is this candidate a good fit for the given job description?"*  
+  - Helps recruiters understand the matching context, not just the score.
 
-TXT resumes → directly read as text
+---
 
-Minimal cleaning (remove extra spaces, special characters where needed)
+## 📋 Assumptions
 
-2. Embedding Generation
-Used all-MiniLM-L6-v2 from sentence-transformers for generating 384-dimensional embeddings.
+- Resumes are in English.  
+- Resume files are well-formatted (name near top, text extractable).  
+- Similarity score is a proxy for relevance — not a hiring decision.  
+- LLM summarization works best with cleaned, relevant resume sections.  
+- Job descriptions are detailed enough for meaningful comparison.
 
-Generated embeddings for:
+---
 
-Job description (once)
+## ⚠ Limitations
+  
+- Candidate name extraction may fail if resumes have unconventional formatting.  
+- LLM summaries depend on model capability — may occasionally be generic.  
+- Cosine similarity does not account for specific skill weights (all terms treated equally).  
+- Large file uploads may impact performance on free hosting tiers.
 
-Each resume (individually)
+## Potential Improvements
 
-3. Similarity Calculation
-Computed cosine similarity between the job description embedding and each resume embedding.
+Here are some ideas to enhance the engine’s functionality and performance - 
 
-Higher score = higher semantic similarity to the job description.
+### 1. Model and Embeddings
+- Experiment with larger or more recent language models for improved summarization quality.  
+- Fine-tune embedding models on domain-specific data for better candidate-job matching.  
+- Cache embeddings to speed up repeated queries.
 
-4. Candidate Name Extraction
-Tried extracting candidate’s name from the first 3 lines of the resume (common format for names at the top).
+### 2. Ranking & Recommendation
+- Incorporate additional ranking criteria like experience level, skills match weighting, or recency of resume updates.  
+- Use a hybrid approach combining semantic similarity with keyword matching for more accurate recommendations.
 
-If not found, fell back to filename without extension.
+### 3. Scalability and Deployment
+- Containerize the app using Docker for easier deployment and scalability.  
+- Integrate with cloud storage (e.g., AWS S3) for resume and job description management.  
+- Use asynchronous processing or batch jobs to handle large volumes of resumes efficiently.
 
-5. Summary Generation
-Used MBZUAI/LaMini-Flan-T5-248M LLM for generating short summaries:
 
-Prompt: "Why is this candidate a good fit for the given job description?"
+## Install dependencies:
+pip install -r requirements.txt
 
-This helps recruiters understand the matching context, not just the score.
+## Running the Engine
+python app.py
 
-📋 Assumptions
-Resumes are in English.
-
-Resume files are well-formatted (name near top, text extractable).
-
-Similarity score is a proxy for relevance — not a hiring decision.
-
-LLM summarization works best with cleaned, relevant resume sections.
-
-Job descriptions are detailed enough for meaningful comparison.
-
-⚠ Limitations
-Cannot perfectly handle image-based (scanned) resumes without OCR.
-
-Candidate name extraction may fail if resumes have unconventional formatting.
-
-LLM summaries depend on model capability — may occasionally be generic.
-
-Cosine similarity does not account for specific skill weights (all terms treated equally).
-
-Large file uploads may impact performance on free hosting tiers.
+This will launch the engine locally, typically at http://127.0.0.1:5000/
+---
