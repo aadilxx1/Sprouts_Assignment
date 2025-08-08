@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Candidate Recommendation Engine</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f4f6f8;
+        color: #333;
+        margin: 30px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #2c3e50;
+        margin-bottom: 30px;
+      }
+
+      form {
+        max-width: 700px;
+        margin: 0 auto 40px auto;
+        background: #fff;
+        padding: 25px 30px;
+        border-radius: 8px;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      }
+
+      label {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      textarea {
+        width: 100%;
+        font-size: 1rem;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        resize: vertical;
+      }
+
+      input[type="file"] {
+        font-size: 1rem;
+        margin-top: 5px;
+      }
+
+      button {
+        margin-top: 20px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-size: 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #2980b9;
+      }
+
+      h2 {
+        text-align: center;
+        color: #34495e;
+        margin-bottom: 20px;
+      }
+
+      table {
+        width: 90%;
+        margin: 0 auto 50px auto;
+        border-collapse: collapse;
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      }
+
+      th, td {
+        text-align: left;
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        vertical-align: top;
+      }
+
+      th {
+        background-color: #3498db;
+        color: white;
+        font-weight: 600;
+      }
+
+      tr:hover {
+        background-color: #f1f9ff;
+      }
+
+      td:nth-child(4) {
+        max-width: 450px;
+        white-space: normal;
+        word-wrap: break-word;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Candidate Recommendation Engine</h1>
+    <form method="POST" enctype="multipart/form-data">
+      <label>Job Description:</label>
+      <textarea name="job_description" rows="10" cols="80" required></textarea>
+
+      <label>Upload Resumes:</label>
+      <input type="file" name="resumes" multiple accept=".txt,.pdf">
+
+      <button type="submit">Rank Candidates</button>
+    </form>
+
+    {% if results %}
+      <h2>Top Matching Candidates</h2>
+      <table>
+        <tr>
+          <th>Candidate</th>
+          <th>File Name</th>
+          <th>Similarity Score</th>
+          <th>Why a Good Fit</th>
+        </tr>
+        {% for r in results %}
+        <tr>
+          <td>{{ r.applicant_name }}</td>
+          <td>{{ r.filename }}</td>
+          <td>{{ r.score }}</td>
+          <td>{{ r.summary }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    {% endif %}
+  </body>
+</html>
